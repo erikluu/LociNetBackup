@@ -16,7 +16,6 @@ data/interview_prep.csv
 analysis/
 
 embeddings/safekeeping/
-embeddings/medium1k_word2vec*
 
 graphs/old/
 

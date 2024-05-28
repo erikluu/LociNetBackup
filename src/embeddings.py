@@ -234,7 +234,7 @@ def get_model_and_pooling_func(model_name: str) -> Tuple[Any, Any, int]:
     
     return tokenizer, model, max_length
 
-def process_embeddings(input: List[Any], model_name: str, pooling_strategy: str, batch_size: int = 32, save_path: str = "") -> torch.Tensor:
+def process_embeddings(input: List[Any], model_name: str, pooling_strategy: str = "mean_pooling", batch_size: int = 32, save_path: str = "") -> torch.Tensor:
     """Process embeddings based on the specified model name and pooling strategy."""
     tokenizer, model, max_length = get_model_and_pooling_func(model_name)
     pooling_strategies = {
