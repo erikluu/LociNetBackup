@@ -85,7 +85,7 @@ def get_embedding_similarity_metrics_per_dataset(dataset_name, dataset_tags, mod
 
     for model_name in model_names:
         for agg_method in agg_methods:
-            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name}_{model_name}_{agg_method}_n10000.pickle")[:5000]
+            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name}_{model_name}_{agg_method}_n10000.pickle")[:2000]
             cosine_sim, soft_cosine_sim, euclidean_sim = sim.get_all_similarities(embeddings)
             dataframes.append(calculate_embedding_metrics_for_all(cosine_sim, soft_cosine_sim, euclidean_sim,
                                             dataset_tags, model_name, dataset_name, agg_method))
