@@ -86,7 +86,7 @@ def get_embedding_similarity_metrics_per_dataset(dataset_name, dataset_tags, mod
 
     for model_name in model_names:
         for agg_method in agg_methods:
-            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name}_{model_name}_{agg_method}_n10000.pickle")[:2000]
+            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name.split('_')[0]}_{model_name}_{agg_method}_n10000.pickle")[:2000]
             cosine_sim, soft_cosine_sim, euclidean_sim = sim.get_all_similarities(embeddings)
             dataframes.append(calculate_embedding_metrics_for_all(cosine_sim, soft_cosine_sim, euclidean_sim,
                                             dataset_tags, model_name, dataset_name, agg_method))
@@ -298,18 +298,8 @@ def compare_cluster_metrics(dataset_name, embedding_models, agg_methods, cluster
 # --------------------------------------------------------
 
 def bfs_tag_connectivity(G, max_depth=3):
-    """
-    Perform BFS to calculate tag connectivity at various depths.
-    
-    Parameters:
-    G (Graph): The networkx graph with nodes having a 'tags' attribute.
-    max_depth (int): The maximum depth for BFS.
-    
-    Returns:
-    dict: A dictionary with depths as keys and tuples as values, where each tuple contains
-          the number of nodes that share one or more tags and the percentage of such nodes.
-    """
-    connectivity = {depth: (0, 0) for depth in range(1, max_depth + 1)}
+    connectivity = {depth: 0 for depth in range(1, max_depth + 1)}
+    tag_counts = {depth: Counter() for depth in range(1, max_depth + 1)}
     visited = set()
 
     for node in G.nodes():
@@ -329,19 +319,21 @@ def bfs_tag_connectivity(G, max_depth=3):
                     visited.add(neighbor)
                     queue.append((neighbor, depth + 1))
                     shared_tags = set(G.nodes[current_node]['tags']) & set(G.nodes[neighbor]['tags'])
-                    if shared_tags:
+                    if len(shared_tags) > 1: # share at least two tags
                         level_nodes[depth + 1].add(neighbor)
+                        tag_counts[depth + 1].update(shared_tags)
 
         for depth in level_nodes:
-            connectivity[depth] = (
-                connectivity[depth][0] + len(level_nodes[depth]),
-                (connectivity[depth][0] + len(level_nodes[depth])) / G.number_of_nodes()
-            )
+            connectivity[depth] += len(level_nodes[depth])
 
-    # Remove depth keys that have no connected nodes
-    connectivity = {depth: value for depth, value in connectivity.items() if value[0] > 0}
+    # Calculate percentages
+    total_nodes = G.number_of_nodes()
+    connectivity_percentages = {depth: (count, count / total_nodes) for depth, count in connectivity.items() if count > 0}
     
-    return connectivity
+    # Filter out empty tag counts
+    tag_counts = {depth: dict(tags) for depth, tags in tag_counts.items() if tags}
+
+    return connectivity_percentages, tag_counts
 
 
 def degree_of_separation(G):
@@ -391,11 +383,13 @@ def calculate_edge_assignment_metrics(G, max_depth=3):
     Returns:
     dict: A dictionary containing the edge assignment metrics.
     """
-    tag_connectivity = bfs_tag_connectivity(G, max_depth)
-    separation_degree = degree_of_separation(G)
+    tag_connectivity, tag_counts = bfs_tag_connectivity(G, max_depth)
+    # separation_degree = degree_of_separation(G)
+    separation_degree = None
 
     metrics = {
         'tag_connectivity': tag_connectivity,
+        'tag_counts': tag_counts,
         'degree_of_separation': separation_degree
     }
 
@@ -428,6 +422,7 @@ def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods,
                                 'depth': None,
                                 'connected_nodes': None,
                                 'percentage_connected': None,
+                                'tag_counts': None,
                                 'degree_of_separation': None
                             })
                             continue
@@ -435,6 +430,7 @@ def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods,
                         # utils.save_graph_to_pickle(G, f"graphs/{dataset_name}_{embedding_model}_{sim_metric}_{agg_method}_{edge_name}_{clusterer_name}.pickle")
                         
                         tag_connectivity = metrics['tag_connectivity']
+                        tag_counts = metrics['tag_counts']
                         degree_of_separation = metrics['degree_of_separation']
 
                         for depth, (connected_nodes, percentage) in tag_connectivity.items():
@@ -448,6 +444,7 @@ def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods,
                                 'depth': depth,
                                 'connected_nodes': connected_nodes,
                                 'percentage_connected': round(percentage, 3),
+                                'tag_counts': tag_counts,
                                 'degree_of_separation': degree_of_separation
                             })
 

@@ -1,4 +1,4 @@
-,dataset,embedding_model,agg_method,similarity,edge constructor,clusterer,depth,connected_nodes,percentage_connected,degree_of_separation
+,dataset,embedding_model,agg_method,similarity,edge_constructor,clusterer,depth,connected_nodes,percentage_connected,degree_of_separation
 0,medium1k,minilm,mean,cosine,random5,kmeans50,1.0,329.0,0.16,2.4877302604944593
 1,medium1k,minilm,mean,cosine,random5,kmeans50,2.0,927.0,0.452,2.4877302604944593
 2,medium1k,minilm,mean,cosine,random5,kmeans50,3.0,412.0,0.201,2.4877302604944593
