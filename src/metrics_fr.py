@@ -1,4 +1,5 @@
 import gc
+import random
 import itertools
 from collections import defaultdict, Counter, deque
 
@@ -354,20 +355,30 @@ def degree_of_separation(G):
     float: The average degree of separation between nodes that share one or more tags.
     """
     path_lengths = []
+    selected_nodes_sets = []
+    # Select 3 sets of 20 nodes to test
+    if len(G.nodes()) > 20:
+        selected_nodes_sets.append(random.sample(list(G.nodes()), 20))
+        selected_nodes_sets.append(random.sample(list(G.nodes()), 20))
+        selected_nodes_sets.append(random.sample(list(G.nodes()), 20))
+    else:
+        selected_nodes_sets.append(list(G.nodes()))
 
-    for node in G.nodes():
-        for neighbor in G.nodes():
-            if node != neighbor and set(G.nodes[node]['tags']) & set(G.nodes[neighbor]['tags']):
-                try:
-                    length = nx.shortest_path_length(G, source=node, target=neighbor, weight='weight')
-                    path_lengths.append(length)
-                except nx.NetworkXNoPath:
-                    continue
+    for selected_nodes in selected_nodes_sets:
+        for node in selected_nodes:
+            for neighbor in selected_nodes:
+                if node != neighbor and set(G.nodes[node]['tags']) & set(G.nodes[neighbor]['tags']):
+                    try:
+                        length = nx.shortest_path_length(G, source=node, target=neighbor, weight='weight')
+                        path_lengths.append(length)
+                    except nx.NetworkXNoPath:
+                        continue
 
     if path_lengths:
         return np.mean(path_lengths)
     else:
         return float('inf')  # If no paths are found
+
 
 def calculate_edge_assignment_metrics(G, max_depth=3):
     """
@@ -420,7 +431,7 @@ def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods,
                         #     })
                         #     continue
 
-                        utils.save_graph_to_pickle(G, f"graphs/{dataset_name}_{embedding_model}_{sim_metric}_{agg_method}_{edge_name}_{clusterer_name}.pickle")
+                        # utils.save_graph_to_pickle(G, f"graphs/{dataset_name}_{embedding_model}_{sim_metric}_{agg_method}_{edge_name}_{clusterer_name}.pickle")
                         
                         metrics = calculate_edge_assignment_metrics(G, max_depth)
 
