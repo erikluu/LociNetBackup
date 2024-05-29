@@ -81,12 +81,12 @@ def calculate_embedding_metrics_for_all(cosine_sim, soft_cosine_sim, euclidean_s
     return all_metrics_df
 
 
-def get_embedding_similarity_metrics_per_dataset(dataset_name, dataset_tags, model_names, agg_methods):
+def get_embedding_similarity_metrics_per_dataset(dataset_name, dataset_tags, model_names, agg_methods, n):
     dataframes = []
 
     for model_name in model_names:
         for agg_method in agg_methods:
-            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name.split('_')[0]}_{model_name}_{agg_method}_n10000.pickle")[:2000]
+            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name.split('_')[0]}_{model_name}_{agg_method}_n10000.pickle")[:n]
             cosine_sim, soft_cosine_sim, euclidean_sim = sim.get_all_similarities(embeddings)
             dataframes.append(calculate_embedding_metrics_for_all(cosine_sim, soft_cosine_sim, euclidean_sim,
                                             dataset_tags, model_name, dataset_name, agg_method))
@@ -234,7 +234,7 @@ def calculate_cluster_tag_purity(docs_by_cluster, tag_counts, total_docs, k):
     return purity_scores
 
 
-def compare_cluster_metrics(dataset_name, embedding_models, agg_methods, clusterer_functions, ids, tags, k):
+def compare_cluster_metrics(dataset_name, embedding_models, agg_methods, clusterer_functions, n, ids, tags, k):
     results = []
 
     tag_counts = get_tags_count(tags)
@@ -242,7 +242,7 @@ def compare_cluster_metrics(dataset_name, embedding_models, agg_methods, cluster
 
     for embedding_model in embedding_models:
         for agg_method in agg_methods:
-            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name}_{embedding_model}_{agg_method}_n10000.pickle")[:2000]
+            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name.split('_')[0]}_{embedding_model}_{agg_method}_n10000.pickle")[:n]
             for clusterer_name, clusterer_f in clusterer_functions.items():
                 try:
                     cluster_labels = clusterer_f(embeddings)
@@ -319,7 +319,7 @@ def bfs_tag_connectivity(G, max_depth=3):
                     visited.add(neighbor)
                     queue.append((neighbor, depth + 1))
                     shared_tags = set(G.nodes[current_node]['tags']) & set(G.nodes[neighbor]['tags'])
-                    if len(shared_tags) > 1: # share at least two tags
+                    if shared_tags: # share at least two tags (only for ArXiv)
                         level_nodes[depth + 1].add(neighbor)
                         tag_counts[depth + 1].update(shared_tags)
 
@@ -396,12 +396,12 @@ def calculate_edge_assignment_metrics(G, max_depth=3):
     return metrics
 
 
-def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods, clusterer_functions, edge_constructor_functions, ids, tags, titles, max_depth=3):
+def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods, clusterer_functions, edge_constructor_functions, n, ids, tags, titles, max_depth=3):
     results = []
 
     for embedding_model in embedding_models:
         for agg_method in agg_methods:
-            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name}_{embedding_model}_{agg_method}_n10000.pickle")[:2000]
+            embeddings = utils.load_from_pickle(f"embeddings/{dataset_name.split('_')[0]}_{embedding_model}_{agg_method}_n10000.pickle")[:n]
             cosine_sim, soft_cosine_sim, euclidean_sim = sim.get_all_similarities(embeddings)
             for sim_mat, sim_metric in zip([cosine_sim, soft_cosine_sim, euclidean_sim], ["cosine", "soft_cosine", "euclidean"]):
                 for edge_name, edge_f in edge_constructor_functions.items():
