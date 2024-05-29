@@ -413,28 +413,27 @@ def compare_edge_assignment_metrics(dataset_name, embedding_models, agg_methods,
                 for edge_name, edge_f in edge_constructor_functions.items():
                     for clusterer_name, clusterer_f in clusterer_functions.items():
                         print(f"graphs/{dataset_name}_{embedding_model}_{sim_metric}_{agg_method}_{edge_name}_{clusterer_name}")
-                        # try:
-                        G = pipe.cluster_and_connect(embeddings, sim_mat, ids, sim_metric, edge_f, clusterer_f, agg.mean_pooling, tags=tags, titles=titles)
-                        # except Exception as e:
-                        #     print(f"Error: {e}")
-                        #     results.append({
-                        #         "dataset": dataset_name,
-                        #         'embedding_model': embedding_model,
-                        #         'agg_method': agg_method,
-                        #         'similarity': sim_metric,
-                        #         'edge constructor': edge_name,
-                        #         'clusterer': clusterer_name,
-                        #         'depth': None,
-                        #         'connected_nodes': None,
-                        #         'percentage_connected': None,
-                        #         'degree_of_separation': None
-                        #     })
-                        #     continue
+                        try:
+                            G = pipe.cluster_and_connect(embeddings, sim_mat, ids, sim_metric, edge_f, clusterer_f, agg.mean_pooling, tags=tags, titles=titles)
+                            metrics = calculate_edge_assignment_metrics(G, max_depth)
+                        except Exception as e:
+                            print(f"Error: {e}")
+                            results.append({
+                                "dataset": dataset_name,
+                                'embedding_model': embedding_model,
+                                'agg_method': agg_method,
+                                'similarity': sim_metric,
+                                'edge constructor': edge_name,
+                                'clusterer': clusterer_name,
+                                'depth': None,
+                                'connected_nodes': None,
+                                'percentage_connected': None,
+                                'degree_of_separation': None
+                            })
+                            continue
 
                         # utils.save_graph_to_pickle(G, f"graphs/{dataset_name}_{embedding_model}_{sim_metric}_{agg_method}_{edge_name}_{clusterer_name}.pickle")
                         
-                        metrics = calculate_edge_assignment_metrics(G, max_depth)
-
                         tag_connectivity = metrics['tag_connectivity']
                         degree_of_separation = metrics['degree_of_separation']
 
