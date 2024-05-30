@@ -1,0 +1,10 @@
+,data_source,embedding_model,agg_method,metric_name,metric,between_all_nodes,between_shared_tags
+0,arXiv0_200,mpnet,mean,cosine,mean,0.57492745,0.6094621
+1,arXiv0_200,mpnet,mean,cosine,median,0.56703115,0.60747993
+2,arXiv0_200,mpnet,mean,cosine,std_dev,0.07388048,0.06622854
+3,arXiv0_200,mpnet,mean,soft_cosine,mean,0.5672981,0.59659517
+4,arXiv0_200,mpnet,mean,soft_cosine,median,0.5633788,0.5965302
+5,arXiv0_200,mpnet,mean,soft_cosine,std_dev,0.088217035,0.08512437
+6,arXiv0_200,mpnet,mean,euclidean,mean,0.432166,0.46199927
+7,arXiv0_200,mpnet,mean,euclidean,median,0.42065686,0.45610142
+8,arXiv0_200,mpnet,mean,euclidean,std_dev,0.06662651,0.062683776

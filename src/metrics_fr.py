@@ -188,7 +188,7 @@ def calculate_tag_concentration_purity(docs_by_cluster, tag_counts, k):
             if tag in tag_counts and tag_counts[tag] > 0:
                 scores.append(max_cluster_count / len(docs_by_cluster[cluster_id]))
         purity_scores[tag] = round(np.mean(scores), 3)
-    
+        
     return purity_scores
 
 
@@ -319,7 +319,7 @@ def bfs_tag_connectivity(G, max_depth=3):
                     visited.add(neighbor)
                     queue.append((neighbor, depth + 1))
                     shared_tags = set(G.nodes[current_node]['tags']) & set(G.nodes[neighbor]['tags'])
-                    if shared_tags: # share at least two tags (only for ArXiv)
+                    if len(shared_tags) > 2: # share at least two tags (only for ArXiv)
                         level_nodes[depth + 1].add(neighbor)
                         tag_counts[depth + 1].update(shared_tags)
 
