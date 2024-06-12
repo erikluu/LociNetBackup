@@ -25,6 +25,7 @@ def save_graph_to_json_and_pickle(G, save_path: str, encoding_f):
     save_graph_to_pickle(G, f'{save_path}.pickle')
 
 
+
 def save_graph_to_json(G, save_path: str):
     graph_data = {
         "nodes": [],
@@ -37,7 +38,11 @@ def save_graph_to_json(G, save_path: str):
         if "titles" not in data:
             raise ValueError(f"Node {node_id} missing title.")
         
-        node_data = {"id": node_id, "pos": data["encodings"][:2], "color": normalize_and_convert_to_hex(data["encodings"][2:5]), "title": data["titles"], "tags": data["tags"]}
+        if "cluster_assignment" in data:
+            node_data = {"id": node_id, "pos": data["encodings"][:2], "color": normalize_and_convert_to_hex(data["encodings"][2:5]), "title": data["titles"], "tags": data["tags"], "cluster": data["cluster_assignment"]}
+        else:
+           node_data = {"id": node_id, "pos": data["encodings"][:2], "color": normalize_and_convert_to_hex(data["encodings"][2:5]), "title": data["titles"], "tags": data["tags"], "cluster": -1} 
+           
         if "simplified_tags" in node_data.keys():
             node_data["simplified_tags"] = data["simplified_tags"]
         graph_data["nodes"].append(node_data)

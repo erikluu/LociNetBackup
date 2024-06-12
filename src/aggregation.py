@@ -19,23 +19,16 @@ def min_pooling(embedding_vectors):
 
 def self_attention(embedding_vectors):
     attention_scores = torch.dot(embedding_vectors, embedding_vectors.T)
-    
     attention_weights = softmax(attention_scores)
-    
-    aggregated_embedding = torch.dot(attention_weights, embedding_vectors)
-    
+    aggregated_embedding = torch.dot(attention_weights, embedding_vectors)    
     return aggregated_embedding
 
 
 def global_attention(embedding_vectors):
-    query_vector = torch.mean(embedding_vectors, dim=0)
-    
+    query_vector = torch.mean(embedding_vectors, dim=0) 
     attention_scores = torch.dot(embedding_vectors, query_vector)
-    
     attention_weights = softmax(attention_scores)
-    
     aggregated_embedding = torch.dot(attention_weights, embedding_vectors)
-    
     return aggregated_embedding
 
 

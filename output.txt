@@ -1,0 +1,11 @@
+By Rashida Kamal and Vivien Ngo
+
+Enigma’s latest project Food for Thought provides an interactive interface to explore health inspection data for restaurants across New York City. We dug a little deeper into the relationships between these inspection scores and how popular restaurants are with New Yorkers to highlight a few hidden gems, as well as the places to avoid.
+
+Click an image to play with the full-sized interactive map!
+
+Methodology
+
+Each map contains geocoded Yelp data on restaurant ratings and prices and restaurant inspection data from Enigma Public. Data analysis was done using Pandas, and histograms were made with Matplotlib with Adobe Illustrator for touching up. Restaurants shown with a “?” were inspected but did not receive a letter grade; for our analysis we used the violations score from the most recent inspection even if a grade was not issued. The interactives were designed by Enigma’s previous data journalism fellow, Rashida Kamal, and the maps were updated with June data by Vivien Ngo. Lots of thanks to Peter Henderson for his help!
+
+Originally published at www.enigma.com on July 19, 2018.
